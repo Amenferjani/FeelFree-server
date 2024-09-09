@@ -1,6 +1,7 @@
 import { IsString, IsOptional, IsNotEmpty, IsArray, IsMongoId, IsNumber, IsObject } from 'class-validator';
+import { ObjectId } from 'mongoose';
 
-export class CreateCommunityDto {
+export class CommunityDto {
     @IsString()
     @IsNotEmpty()
     name: string;
@@ -11,7 +12,7 @@ export class CreateCommunityDto {
 
     @IsMongoId()
     @IsNotEmpty()
-    creator: string;
+    creator: ObjectId;
 
     @IsOptional()
     @IsArray()

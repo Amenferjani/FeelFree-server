@@ -1,10 +1,80 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { Post } from '../schemas/post.schema';
+import { PostM } from '../schemas/post.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from "mongoose"
+import { PostDto } from '../models/newPost.dto';
+import { IPost } from '../models/post.model';
 @Injectable()
 export class PostService {
-    constructor(@InjectModel(Post.name) private postModel: Model<Post>) { }
+    constructor(@InjectModel(PostM.name) private postModel: Model<PostM>) { }
     
+    async create(post: PostDto): Promise<IPost> {
+        const newPost = await this.postModel.create(post) 
+        return newPost.toObject() as unknown as IPost;
+    }
+
+    async findOneById(id: ObjectId): Promise<PostM>{
+        const post = this.postModel.findById(id);
+        if (!post) {
+            throw new NotFoundException('');
+        }
+        return post 
+    }
+
+    async update(body : any) {
+        const post = await this.postModel.findById(body.id);
+
+        if (!post) {
+            throw new NotFoundException();
+        }
+        if (post.op.toString() !== body.userId) {
+            throw new ForbiddenException();
+        }
+        if (body.content) {
+            post.content = body.content;
+        }
+        if (body.title) {
+            post.title = body.title;
+        }
+        await post.save();
+        return "updated"
+    }
+
+    async delete(id: ObjectId , userId: ObjectId) {
+        const post = await this.postModel.findById(id);
+
+        if (!post) {
+            throw new NotFoundException();
+        }
+        await this.postModel.findByIdAndDelete(id)
+        return {
+            message: 'Post deleted successfully',
+            userId: userId,
+        }
+    }
+
+    async updateBoost(id: ObjectId , boost?: number) {
+        const post = await this.postModel.findById(id);
+        if (!post) {
+            throw new NotFoundException('');
+        }
+        if (boost === undefined || boost === null) {
+            post.boost += 1;
+        } else {
+            post.boost += boost;
+        }
+        return await post.save();
+    }
+
+    async validateOp(id: ObjectId, userId: ObjectId): Promise<Boolean>{
+        const post = await this.findOneById(id);
+        if (!post) {
+            throw new NotFoundException();
+        }
+        if (post.op.toString() !== userId.toString()) {
+            return false
+        }
+        return true;
+    }
 }

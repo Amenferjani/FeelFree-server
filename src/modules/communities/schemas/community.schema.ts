@@ -5,7 +5,7 @@ export type CommunityDocument = HydratedDocument<Community>;
 
 @Schema()
 export class Community {
-    @Prop({ required: true })
+    @Prop({ required: true ,unique : true})
     name: string;
 
     @Prop({ required: true ,default : ""})

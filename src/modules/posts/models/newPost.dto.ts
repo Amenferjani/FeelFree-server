@@ -1,6 +1,6 @@
 import { IsArray, IsDateString, IsNotEmpty, IsObject, IsOptional, IsString, IsMongoId, IsNumber } from 'class-validator';
 
-export class CreatePostDto {
+export class PostDto {
     @IsMongoId()
     @IsNotEmpty()
     op: string;

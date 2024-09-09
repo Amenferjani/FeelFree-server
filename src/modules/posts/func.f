@@ -1,45 +1,65 @@
-Create a Post:
-
-Endpoint: POST /posts
-Functionality: Allows users to create a new post. The post should include content, title, author information, and possibly tags or categories.
-Response: Return the created post or a success message.
-Get a Single Post by ID:
-
-Endpoint: GET /posts/:id
-Functionality: Retrieves a specific post by its ID.
-Response: Return the post data or a NotFoundException if the post doesn't exist.
-Get All Posts:
-
-Endpoint: GET /posts
-Functionality: Fetches all posts, possibly with pagination and filtering options.
-Response: Return a list of posts or an empty array if no posts are found.
-Update a Post:
-
-Endpoint: PUT /posts/:id
-Functionality: Allows users to update an existing post. Typically, users should only be able to update their own posts.
-Response: Return the updated post or a success message.
-Delete a Post:
-
-Endpoint: DELETE /posts/:id
-Functionality: Deletes a post by its ID. This could be restricted to the post's author or admins.
-Response: Return a success message indicating the post has been deleted.
-Get Posts by a Specific User:
-
-Endpoint: GET /users/:userId/posts
-Functionality: Retrieves all posts made by a specific user.
-Response: Return a list of posts by the user.
-Like/Dislike a Post:
-
-Endpoint: POST /posts/:id/like
-Functionality: Allows users to like or dislike a post. This might involve updating a likes count or a similar mechanism.
-Response: Return a success message or the updated like count.
-Comment on a Post:
-
-Endpoint: POST /posts/:id/comments
-Functionality: Allows users to add comments to a specific post.
-Response: Return the created comment or a success message.
-Get Comments for a Post:
-
-Endpoint: GET /posts/:id/comments
-Functionality: Fetches all comments associated with a specific post.
-Response: Return a list of comments for the post.
+1. Create a Post
+HTTP Method: POST
+Endpoint: /posts
+Description: Create a new post.
+Request Body: Contains the post details such as content, title, media, tags, etc.
+2. Get a Single Post
+HTTP Method: GET
+Endpoint: /posts/:id
+Description: Retrieve a single post by its ID.
+URL Parameter: id (the ID of the post)
+3. Get All Posts
+HTTP Method: GET
+Endpoint: /posts
+Description: Retrieve a list of all posts, optionally with filtering, pagination, and sorting.
+Query Parameters:
+page (for pagination)
+limit (number of posts per page)
+sort (sort by field like date, boost, etc.)
+tags (filter posts by tags)
+community (filter posts by community)
+4. Update a Post
+HTTP Method: PATCH or PUT
+Endpoint: /posts/:id
+Description: Update an existing post by its ID.
+Request Body: Contains the fields to be updated (e.g., content, title, media).
+5. Delete a Post
+HTTP Method: DELETE
+Endpoint: /posts/:id
+Description: Delete a post by its ID.
+URL Parameter: id (the ID of the post)
+6. Add Comments to a Post
+HTTP Method: PATCH
+Endpoint: /posts/:id/comments
+Description: Add a comment to a post.
+Request Body: Contains comment details.
+7. Get Comments for a Post
+HTTP Method: GET
+Endpoint: /posts/:id/comments
+Description: Retrieve comments for a specific post.
+URL Parameter: id (the ID of the post)
+Query Parameters:
+page (for pagination)
+limit (number of comments per page)
+8. Boost a Post
+HTTP Method: PATCH
+Endpoint: /posts/:id/boost
+Description: Increase the boost value of a post.
+Request Body: Contains information to update the boost value.
+9. Remove Boost from a Post
+HTTP Method: PATCH
+Endpoint: /posts/:id/boost
+Description: Decrease or remove the boost value of a post.
+Request Body: Contains information to update the boost value.
+10. Get Posts by Tags
+HTTP Method: GET
+Endpoint: /posts/tags/:tag
+Description: Retrieve posts that have a specific tag.
+URL Parameter: tag (the tag to filter posts by)
+11. Search Posts
+HTTP Method: GET
+Endpoint: /posts/search
+Description: Search for posts based on a query.
+Query Parameters:
+query (search term)
+sort (sort by relevance, date, etc.)

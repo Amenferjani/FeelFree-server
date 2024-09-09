@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, InternalServerErrorException, NotFoundException, Post, Query, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Query} from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { IUser } from '../models/user.model';
 import { User } from '../schemas/user.schema';
@@ -25,7 +25,6 @@ export class UserController {
         }
     }
     @Delete('-i')
-    // @HttpCode(HttpStatus.NO_CONTENT)
     async deleteById(@Query('id') id: ObjectId){
         try {
             return await this.userService.deleteById(id);
@@ -38,14 +37,6 @@ export class UserController {
         try {
             const user = await this.userService.findOneSafe(username);
             return user;
-        } catch (error) {
-            errorHandler(error);
-        }
-    }
-    @Post('login')
-    async getInfo(@Body() User: IUser): Promise<User> {
-        try {
-            return await this.userService.login(User);
         } catch (error) {
             errorHandler(error);
         }
