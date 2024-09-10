@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { CommunityService } from '../services/community.service';
 import { CommunityDto } from '../dto/newCommunity.dto';
-import { errorHandler } from 'src/utils/exceptions';
+import { errorHandler } from 'src/utils/errors/exceptions';
 import { Community } from '../schemas/community.schema';
 import { ObjectId } from 'mongoose';
 

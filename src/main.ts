@@ -4,6 +4,8 @@ import * as dotenv from 'dotenv';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
+import * as csurf from 'csurf';
 
 async function bootstrap() {
   dotenv.config();
@@ -22,6 +24,8 @@ async function bootstrap() {
 }
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe());
+  app.use(helmet());
+  app.use(csurf())
   app.enableCors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'PATCH', 'OPTIONS'],

@@ -14,7 +14,7 @@ export class CommentService {
     }
 
     async findOneById(id: ObjectId): Promise<Comment>{
-        const comment = this.commentModel.findById(id);
+        const comment = this.commentModel.findById(id).lean();
         if (!comment) {
             throw new NotFoundException();
         }
@@ -22,11 +22,20 @@ export class CommentService {
     }
 
     async findAllByPost(postId: ObjectId): Promise<Comment[]>{
-        const comments = this.commentModel.find({ post : postId});
+        const comments = this.commentModel.find({ post : postId ,replayedTo : null}).lean();
+        return comments;
+    }
+
+    async getRelatedComments(id: ObjectId): Promise<Comment[]>{
+        const comments = this.commentModel
+            .find({ replayedTo: id})
+            .sort({ timestamp: -1 })
+            .lean()
+            .exec();
         if (!comments) {
             throw new NotFoundException();
         }
-        return comments;
+        return comments
     }
 
     async update(body : any) {

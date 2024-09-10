@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { IUser } from 'src/modules/users/models/user.model';
-import { errorHandler } from 'src/utils/exceptions';
+import { errorHandler } from 'src/utils/errors/exceptions';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { RefreshJwtAuthGuard } from '../config/guard/refresh-jwt-auth.guard';
 
@@ -35,6 +35,7 @@ export class AuthController {
                 firstName:{type: 'string'},
                 email: {type: 'string'},
                 access_token: { type: 'string' },
+                refresh_token: { type: 'string' },
             },
         },
     })

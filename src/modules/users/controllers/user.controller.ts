@@ -3,7 +3,7 @@ import { UserService } from '../services/user.service';
 import { IUser } from '../models/user.model';
 import { User } from '../schemas/user.schema';
 import { ObjectId } from "mongoose"
-import { errorHandler } from 'src/utils/exceptions';
+import { errorHandler } from 'src/utils/errors/exceptions';
 
 @Controller('user')
 export class UserController {
