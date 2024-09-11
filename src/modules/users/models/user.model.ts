@@ -6,4 +6,6 @@ export interface IUser {
     firstName: string;
     email: string;
     password: string;
+    // communities?: ObjectId[];
+    // posts?:ObjectId[]
 }

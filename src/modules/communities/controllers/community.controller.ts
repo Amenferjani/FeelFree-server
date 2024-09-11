@@ -1,17 +1,20 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Request, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { CommunityService } from '../services/community.service';
-import { CommunityDto } from '../dto/newCommunity.dto';
+import { CommunityDto } from '../models/newCommunity.dto';
 import { errorHandler } from 'src/utils/errors/exceptions';
 import { Community } from '../schemas/community.schema';
 import { ObjectId } from 'mongoose';
+import { JwtAuthGuard } from 'src/modules/auth/config/guard/jwtAuth.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('community')
 export class CommunityController {
     constructor(private readonly communityService: CommunityService) { }
+
     @Post('create')
-    async createCommunity(@Body() community: CommunityDto): Promise<Community> {
+    async createCommunity(@Body() community: CommunityDto){
         try {
-            return this.communityService.create(community);
+            return await this.communityService.create(community);
         } catch (error) {
             errorHandler(error)
         }
@@ -36,45 +39,72 @@ export class CommunityController {
     }
 
     @Patch(':id/mods')
-    async addMods(@Param('id') id: ObjectId, @Body() mods: ObjectId[]) {
-        try {
-            return this.communityService.addMods(id, mods);
-        } catch (error) {
-            errorHandler(error)
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    async addMods(@Param('id') id: ObjectId, @Request() req) {
+        const body = {
+            mods: req.body.mods,
+            userId: req.user.userId, 
         }
-    }
-
-    @Patch(':id/tags')
-    async addTags(@Param('id') id: ObjectId, @Body() tags: string[]) {
         try {
-            return this.communityService.addTags(id, tags);
+            return this.communityService.addMods(id, body.userId, body.mods);
         } catch (error) {
             errorHandler(error)
         }
     }
 
     @Patch(':id/mod')
-    async removeMod(@Param('id') id: ObjectId, @Body() mods: ObjectId) {
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    async removeMod(@Param('id') id: ObjectId, @Body() mod: ObjectId, @Request() req) {
+        const body = {
+            mod: req.body.mod,
+            userId: req.user.userId, 
+        }
         try {
-            return this.communityService.removeMod(id, mods);
+            return this.communityService.removeMod(id, body.userId, body.mod);
+        } catch (error) {
+            errorHandler(error)
+        }
+    }
+
+    @Patch(':id/tags')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    async addTags(@Param('id') id: ObjectId, @Request() req) {
+        const body = {
+            tags: req.body.tags,
+            userId: req.user.userId, 
+        }
+        try {
+            return this.communityService.addTags(id, body.userId, body.tags);
         } catch (error) {
             errorHandler(error)
         }
     }
 
     @Patch(':id/tag')
-    async removeTag(@Param('id') id: ObjectId, @Body() tag: string) {
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    async removeTag(@Param('id') id: ObjectId, @Request() req) {
+        const body = {
+            tag: req.body.tag,
+            userId: req.user.userId, 
+        }
         try {
-            return this.communityService.removeTag(id, tag);
+            return this.communityService.removeTag(id, body.userId, body.tag);
         } catch (error) {
             errorHandler(error)
         }
     }
 
     @Delete('-i')
-    async deleteCommunity(@Param('id') id: ObjectId) {
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    async deleteCommunity(@Param('id') id: ObjectId, @Request() req) {
+        const userId = req.user.userId;
         try {
-            return this.communityService.delete(id);
+            return this.communityService.delete(id,userId);
         } catch (error) {
             errorHandler(error)
         }

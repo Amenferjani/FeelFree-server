@@ -3,18 +3,23 @@ import { User } from '../schemas/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcryptJs from 'bcryptjs';
-import { IUser } from '../models/user.model';
 import { ObjectId } from 'mongoose';
+import { UserDto } from '../models/newUser.dto';
 
 @Injectable()
 export class UserService {
     constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-    async create(requestData: IUser): Promise<User> {
-        const existingUser = await this.userModel.findOne({ username: requestData.username });
+    async create(requestData: UserDto): Promise<User> {
+        const existingUsername = await this.userModel.findOne({ username: requestData.username });
 
-        if (existingUser) {
-            throw new BadRequestException('');
+        if (existingUsername) {
+            throw new BadRequestException('Username already exists');
+        }
+        const existingUserEmail = await this.userModel.findOne({ email: requestData.email });
+
+        if (existingUserEmail) {
+            throw new BadRequestException('Email already exists');
         }
         const salt = await bcryptJs.genSalt(10);
         const hashedPassword = await bcryptJs.hash(requestData.password, salt);
@@ -50,6 +55,8 @@ export class UserService {
         return await this.userModel.findByIdAndDelete(id);
     }
 
+    //!!! for post controller :
+
     async addPost(id: ObjectId, postId: ObjectId) {
         const user = await this.userModel.findById(id);
         if (!user) {
@@ -78,25 +85,29 @@ export class UserService {
         return ;
     }
 
-    async addComment(id: ObjectId, commentId: ObjectId) {
+    //!!! for community controller :
+
+    async addCommunity(id: ObjectId, communityId: ObjectId) {
         const user = await this.userModel.findById(id);
         if (!user) {
             throw new NotFoundException('User not found');
         }
-        user.comments.push( commentId );
+        user.communities.push( communityId );
         return
     }
 
-    async removeComment(id: ObjectId, commentId: ObjectId) {
+    async removeCommunity(id: ObjectId, communityId: ObjectId) {
         const user = await this.userModel.findById(id);
         if (!user) {
             throw new NotFoundException('User not found');
         }
-        if (!user.comments.includes(commentId)) {
+        if (!user.communities.includes(communityId)) {
             throw new NotFoundException('');
         }
 
-        user.comments = user.comments.filter(comment => comment.toString() !== commentId.toString());
+        user.communities = user.communities.filter(
+            community => community.toString() !== communityId.toString()
+        );
         user.save();
         return ;
     }

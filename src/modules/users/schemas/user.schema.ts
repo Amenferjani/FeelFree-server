@@ -21,7 +21,7 @@ export class User {
     password: string;
     
     @Prop({default : []})
-    comments :ObjectId[]
+    communities :ObjectId[]
 
     @Prop({default : []})
     posts :ObjectId[]
