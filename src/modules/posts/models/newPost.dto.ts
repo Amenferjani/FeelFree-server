@@ -36,14 +36,7 @@ export class PostDto {
     @IsObject()
     @IsOptional()
     media?: {
-        videos?: Array<{
-            data: Buffer;
-            contentType: string;
-        }>;
-
-        images?: Array<{
-            data: Buffer;
-            contentType: string;
-        }>;
+        videos?: Array<any>,
+        images?: Array<any>
     };
 }

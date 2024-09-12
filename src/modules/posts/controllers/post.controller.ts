@@ -23,6 +23,7 @@ export class PostController {
         type: PostM
     })
     @ApiResponse({ status: 400, description: 'Bad Request' })
+    @ApiResponse({ status: 404, description: 'Not Found' })
     async createPost(@Body() post: PostDto) {
         try {
             const postResult = await this.postService.create(post);
@@ -66,11 +67,6 @@ export class PostController {
             }
         }
     })
-    @ApiResponse({
-        status: 200,
-        description: 'Post updated successfully',
-        type: PostM
-    })
     @ApiResponse({ status: 404, description: 'Post not found' })
     @ApiResponse({ status: 403, description: 'ForbiddenException' })
     async updatePost(@Query('id') id: ObjectId, @Request() req) {
@@ -100,7 +96,6 @@ export class PostController {
             properties: {
                 boost: { type: 'number' }
             },
-            required: ['boost']
         }
     })
     @ApiResponse({

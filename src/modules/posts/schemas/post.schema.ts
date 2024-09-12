@@ -30,12 +30,12 @@ export class PostM {
     community: ObjectId
 
     @Prop({type: {
-            videos: [{data: { type: Buffer },contentType: { type: String }}],
-            images: [{data: { type: Buffer },contentType: { type: String }}],
+            videos: [{type: mongoose.Schema.Types.Mixed }],
+            images: [{type: mongoose.Schema.Types.Mixed }],
         },default: { videos: [], images: [] }})
     media: {
-        videos: {data: Buffer;contentType: string}[];
-        images: {data: Buffer;contentType: string}[];
+        videos: {type: mongoose.Schema.Types.Mixed }[];
+        images: {type: mongoose.Schema.Types.Mixed }[];
     };
 }
 

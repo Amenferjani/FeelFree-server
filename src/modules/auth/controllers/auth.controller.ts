@@ -2,8 +2,9 @@ import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { IUser } from 'src/modules/users/models/user.model';
 import { errorHandler } from 'src/utils/errors/exceptions';
-import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { RefreshJwtAuthGuard } from '../config/guard/refresh-jwt-auth.guard';
+import { join } from 'path';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -49,8 +50,9 @@ export class AuthController {
         }
     }
 
-    @UseGuards(RefreshJwtAuthGuard)
     @Post('refresh-token')
+    @UseGuards(RefreshJwtAuthGuard)
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'refresh-token' })
     @ApiBody({
         description: ' credentials for refreshing access token',

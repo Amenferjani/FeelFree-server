@@ -17,6 +17,9 @@ export class User {
     @Prop({ required: true })
     email: string;
 
+    @Prop({ type: mongoose.Schema.Types.Mixed })
+    profilePicture?: any; 
+
     @Prop({ required: true , unique : true})
     password: string;
     

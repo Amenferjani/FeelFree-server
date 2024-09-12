@@ -5,11 +5,13 @@ import { CommunityController } from './controllers/community.controller';
 import { CommunityService } from './services/community.service';
 import { UserService } from '../users/services/user.service';
 import { User, UserSchema } from '../users/schemas/user.schema';
+import { MediaModule } from '../media/media.module';
 
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: Community.name, schema: CommunitySchema }]),
-        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])
+        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+        MediaModule,
     ],
     controllers: [CommunityController],
     providers: [CommunityService,UserService],

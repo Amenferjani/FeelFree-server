@@ -5,9 +5,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from "mongoose"
 import { PostDto } from '../models/newPost.dto';
 import { IPost } from '../models/post.model';
+import { MediaService } from 'src/modules/media/services/media.service';
 @Injectable()
 export class PostService {
-    constructor(@InjectModel(PostM.name) private postModel: Model<PostM>) { }
+    constructor(@InjectModel(PostM.name)
+    private readonly postModel: Model<PostM>,
+    private readonly mediaService : MediaService
+    ) { }
     
     async create(post: PostDto): Promise<IPost> {
         const newPost = await this.postModel.create(post) 

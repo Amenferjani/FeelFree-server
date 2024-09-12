@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post, Query, UseGuards} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Post, Query, Request, UploadedFile, UseGuards} from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { IUser } from '../models/user.model';
 import { User } from '../schemas/user.schema';
@@ -57,6 +57,35 @@ export class UserController {
         try {
             const user = await this.userService.findOneSafe(username);
             return user;
+        } catch (error) {
+            errorHandler(error);
+        }
+    }
+
+    @Patch('Profile-picture')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiBody({
+        type: 'object',
+        schema: {
+            properties: {
+                profilePicture: { type: 'string' }
+            }
+        }
+    })
+    @ApiResponse({ status: 200, type: User })
+    @ApiResponse({ status: 404, description: 'User not found' })
+    @ApiResponse({ status: 400, description: 'Bad Request' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    async updateProfilePicture(
+            @UploadedFile() profilePicture: Express.Multer.File,
+            @Request() req
+        ): Promise<User> {
+        const userId = req.user.userId;
+        try {
+            return await this
+                .userService
+                .updateProfilePicture(userId, profilePicture);
         } catch (error) {
             errorHandler(error);
         }

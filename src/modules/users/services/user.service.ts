@@ -5,10 +5,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as bcryptJs from 'bcryptjs';
 import { ObjectId } from 'mongoose';
 import { UserDto } from '../models/newUser.dto';
+import { MediaService } from 'src/modules/media/services/media.service';
 
 @Injectable()
 export class UserService {
-    constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+    constructor(@InjectModel(User.name)
+        private readonly userModel: Model<User>,
+        private readonly mediaService: MediaService,
+    ) { }
 
     async create(requestData: UserDto): Promise<User> {
         const existingUsername = await this.userModel.findOne({ username: requestData.username });
@@ -49,6 +53,20 @@ export class UserService {
             throw new NotFoundException('User not found');
         }
         return user;
+    }
+
+    async updateProfilePicture(userId: string, profilePicture: Express.Multer.File):Promise<User>{
+        const fileName = await this.mediaService.uploadProfilePicture(profilePicture);
+        const updatedUser = await this.userModel.findByIdAndUpdate(
+            userId,
+            { profilePicture: fileName }, 
+            { new: true },
+        ).exec();
+        if (!updatedUser) {
+            throw new NotFoundException('User not found');
+        }
+
+        return updatedUser;
     }
 
     async deleteById(id: ObjectId): Promise<User> {

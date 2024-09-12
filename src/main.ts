@@ -6,22 +6,16 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import * as csurf from 'csurf';
+import * as express from 'express';
+import { ExpressAdapter } from '@nestjs/platform-express';
 
 async function bootstrap() {
+  const server = express();
+  server.use('/uploads', express.static('uploads'));
+
   dotenv.config();
-  const app = await NestFactory.create(AppModule);
-  
-  if(process.env.NODE_ENV === 'DEV'){
-  const config = new DocumentBuilder()
-    .setTitle('API Documentation')
-    .setDescription('The API documentation for your project')
-    .setVersion('1.0')
-    .addTag('API')
-    .build();
-  
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api-docs', app, document); 
-}
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe());
   app.use(helmet());
@@ -33,8 +27,21 @@ async function bootstrap() {
   });
 
   app.useGlobalFilters(new AllExceptionsFilter());
+
+    if(process.env.NODE_ENV === 'DEV'){
+  const config = new DocumentBuilder()
+    .setTitle('API Documentation')
+    .setDescription('The API documentation for your project')
+    .setVersion('1.0')
+    .addTag('API')
+    .build();
   
-  await app.listen(8080);
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api-docs', app, document); 
+  }
+
+  const port = process.env.PORT || 8080;
+  await app.listen(port);
   console.log(`
         🚀 Server Status 🚀
        *********************
@@ -45,6 +52,5 @@ async function bootstrap() {
      *                       *
        *********************
               `);
-
 }
 bootstrap();
