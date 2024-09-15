@@ -5,23 +5,23 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class MediaService {
-    private static readonly allowedImageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
-    private static readonly allowedVideoExtensions = ['.mp4'];
+    readonly allowedImageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+    readonly allowedVideoExtensions = ['.mp4'];
 
     async uploadPostMedia(file: Express.Multer.File): Promise<string> {
-        return this.uploadFile(file, 'posts', MediaService.allowedImageExtensions.concat(MediaService.allowedVideoExtensions));
+        return this.uploadFile(file, 'posts', this.allowedImageExtensions.concat(this.allowedVideoExtensions));
     }
 
     async uploadProfilePicture(file: Express.Multer.File): Promise<string> {
-        return this.uploadFile(file, 'profile-pictures', MediaService.allowedImageExtensions);
+        return this.uploadFile(file, 'profile-pictures', this.allowedImageExtensions);
     }
 
     async uploadCommunityBanner(file: Express.Multer.File): Promise<string> {
-        return this.uploadFile(file, 'community-banners', MediaService.allowedImageExtensions);
+        return this.uploadFile(file, 'community-banners', this.allowedImageExtensions);
     }
 
     async uploadCommunityLogo(file: Express.Multer.File): Promise<string> {
-        return this.uploadFile(file, 'community-logos', MediaService.allowedImageExtensions);
+        return this.uploadFile(file, 'community-logos', this.allowedImageExtensions);
     }
 
     private async uploadFile(file: Express.Multer.File, directory: string, allowedExtensions: string[]): Promise<string> {

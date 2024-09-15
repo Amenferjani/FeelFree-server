@@ -19,7 +19,8 @@ import { AuthModule } from './modules/auth/auth.module';
     CommunityModule,
     PostModule,
     CommentModule,
-    AuthModule
+    AuthModule,
+    
   ],
   controllers: [],
   providers: [],

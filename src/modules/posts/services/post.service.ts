@@ -6,17 +6,20 @@ import { ObjectId } from "mongoose"
 import { PostDto } from '../models/newPost.dto';
 import { IPost } from '../models/post.model';
 import { MediaService } from 'src/modules/media/services/media.service';
+import { join, extname } from 'path';
+
 @Injectable()
 export class PostService {
     constructor(@InjectModel(PostM.name)
     private readonly postModel: Model<PostM>,
     private readonly mediaService : MediaService
     ) { }
-    
-    async create(post: PostDto): Promise<IPost> {
-        const newPost = await this.postModel.create(post) 
+
+    async create(post: PostDto, files: Express.Multer.File[]): Promise<IPost> {
+        const {images, videos} = await this.uploadFiles(files);
+        const newPost = await this.postModel.create({...post, media: {images, videos}});
         return newPost.toObject() as unknown as IPost;
-    }
+}
 
     async findOneById(id: ObjectId): Promise<PostM>{
         const post = this.postModel.findById(id);
@@ -80,5 +83,34 @@ export class PostService {
             return false
         }
         return true;
+    }
+
+    private async uploadFiles(files: Express.Multer.File[]): Promise<{images: string[], videos: string[]}> {
+        const imageFileNames: string[] = [];
+        const videoFileNames: string[] = [];
+
+        for (const file of files) {
+            if (this.mediaService.allowedImageExtensions
+                    .includes(extname(file.originalname)
+                    .toLowerCase())
+                ) {
+                imageFileNames
+                    .push(await this
+                        .mediaService.
+                        uploadPostMedia(file)
+                    );
+            } else if (this.mediaService.allowedVideoExtensions
+                .includes(extname(file.originalname)
+                .toLowerCase())
+            ) {
+                videoFileNames
+                    .push(await this
+                        .mediaService
+                        .uploadPostMedia(file)
+                    );
+            }
+        }
+
+        return {images: imageFileNames, videos: videoFileNames};
     }
 }

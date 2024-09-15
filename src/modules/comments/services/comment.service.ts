@@ -3,14 +3,18 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Comment } from '../schemas/comment.schema';
 import { Model, ObjectId } from 'mongoose';
 import { CommentDto } from '../models/comment.dto';
+import { EventGateway } from 'src/modules/events/events.gateway';
 
 @Injectable()
 export class CommentService {
-    constructor(@InjectModel('Comment') private readonly commentModel: Model<Comment>) {}
+    constructor(@InjectModel('Comment') private readonly commentModel: Model<Comment>,
+        private readonly eventGateway : EventGateway) { }
     
     async create(requestData: CommentDto): Promise<Comment> {
         const newComment = new this.commentModel(requestData);
-        return newComment.save();
+        newComment.save();
+        this.eventGateway.server.emit('comment.created', newComment);
+        return newComment;
     }
 
     async findOneById(id: ObjectId): Promise<Comment>{

@@ -69,7 +69,7 @@ export class UserController {
         type: 'object',
         schema: {
             properties: {
-                profilePicture: { type: 'string' }
+                profilePicture: { type: 'Express.Multer.File' }
             }
         }
     })

@@ -5,24 +5,31 @@ import { InjectModel } from '@nestjs/mongoose';
 import { CommunityDto } from '../models/newCommunity.dto';
 import { ICommunity } from '../models/community.model';
 import { UserService } from 'src/modules/users/services/user.service';
+import { MediaService } from 'src/modules/media/services/media.service';
+import { extname } from 'path';
 
 @Injectable()
 export class CommunityService {
     constructor(@InjectModel('Community')
         private readonly communityModel: Model<Community>,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly mediaService : MediaService
     ) { }
     
-    async create(requestData: CommunityDto) {
+    async create(requestData: CommunityDto,
+    logo: Express.Multer.File,
+    banner: Express.Multer.File):Promise<ICommunity> {
         const existingCommunity = await this.communityModel.findOne({ name: requestData.name });
 
         if (existingCommunity) {
             throw new BadRequestException('');
         }
 
-        const newCommunity = await this.communityModel.create(requestData);
+        const { logoName, bannerName } = await this.uploadFiles(logo, banner);
+        const newCommunity = await this.communityModel.create({...requestData,media:{logoName,bannerName}});
         const community = newCommunity.toObject() as unknown as ICommunity
-        return await this.userService.addCommunity(requestData.creator,community._id);
+        await this.userService.addCommunity(requestData.creator, community._id);
+        return community;
     }
 
     async findOne(communityName: string): Promise<Community >{
@@ -52,6 +59,44 @@ export class CommunityService {
         }
         const newMods = mods.filter(mod => !community.mods.includes(mod));
         community.mods = [...community.mods, ...newMods];
+        await community.save();
+        return ;
+    }
+
+    async updateCommunityLogo(communityId: ObjectId, userId: ObjectId,logo: Express.Multer.File) {
+        const community = await this.communityModel.findById(communityId);
+        let logoName = "";
+        if (!community) {
+            throw new NotFoundException('');
+        }
+        if (!this.validateCreator(community, userId) && !this.validateMod(community, userId)) {
+            throw new UnauthorizedException('');
+        }
+        if (logo) {
+            logoName = await this.mediaService.uploadCommunityLogo(logo);
+        } else {
+            logoName = community.media.logo;
+        }
+        community.media.logo = logoName;
+        await community.save();
+        return ;
+    }
+
+    async updateCommunityBanner(communityId: ObjectId, userId: ObjectId,banner: Express.Multer.File) {
+        const community = await this.communityModel.findById(communityId);
+        let bannerName = "";
+        if (!community) {
+            throw new NotFoundException('');
+        }
+        if (!this.validateCreator(community, userId) && !this.validateMod(community, userId)) {
+            throw new UnauthorizedException('');
+        }
+        if (banner) {
+            bannerName = await this.mediaService.uploadCommunityBanner(banner);
+        } else {
+            bannerName = community.media.banner;
+        }
+        community.media.banner = bannerName;
         await community.save();
         return ;
     }
@@ -125,5 +170,21 @@ export class CommunityService {
     }
     private validateMod(community: Community, modId: ObjectId): Boolean{
         return community.mods.includes(modId);
+    }
+
+    private async uploadFiles(logo: Express.Multer.File, banner: Express.Multer.File)
+        : Promise<{ logoName: string, bannerName: string }>{
+        let logoName = "";
+        let bannerName = "";
+
+        if (logo) {
+            logoName = await this.mediaService.uploadCommunityLogo(logo);
+        }
+
+        if (banner ) {
+            bannerName = await this.mediaService.uploadCommunityBanner(banner);
+        }
+
+        return { logoName , bannerName }
     }
 }

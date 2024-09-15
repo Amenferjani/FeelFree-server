@@ -27,14 +27,8 @@ export class CommunityDto {
     @IsObject()
     @IsOptional()
     media: {
-        logo: {
-            data: Buffer;
-            contentType: string;
-        };
-        banner: {
-            data: Buffer;
-            contentType: string;
-        };
+        logo: any,
+        banner: any
     };
 
     @IsOptional()

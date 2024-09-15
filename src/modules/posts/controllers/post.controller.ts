@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Request, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Request, UnauthorizedException, UploadedFile, UseGuards } from '@nestjs/common';
 import { PostService } from '../services/post.service';
 import { PostDto } from '../models/newPost.dto';
 import { PostM } from '../schemas/post.schema';
@@ -24,9 +24,9 @@ export class PostController {
     })
     @ApiResponse({ status: 400, description: 'Bad Request' })
     @ApiResponse({ status: 404, description: 'Not Found' })
-    async createPost(@Body() post: PostDto) {
+    async createPost(@Body() post: PostDto, @UploadedFile() profilePicture: Express.Multer.File[]) {
         try {
-            const postResult = await this.postService.create(post);
+            const postResult = await this.postService.create(post, profilePicture);
             const request = {
                 id: postResult.op,
                 postId: postResult._id

@@ -21,12 +21,12 @@ export class Community {
     tags: string[];
 
     @Prop({type: {
-            logo: {data: { type: Buffer },contentType: { type: String }},
-            banner: {data: { type: Buffer },contentType: { type: String }},
+            logo: {type: mongoose.Schema.Types.Mixed},
+            banner: {type: mongoose.Schema.Types.Mixed},
         },default: { logo: "", banner: "" }})
     media: {
-        logo: {data: Buffer;contentType: string};
-        banner: {data: Buffer;contentType: string};
+        logo: any; 
+        banner: any; 
     };
 
     @Prop({ default: 1 })
